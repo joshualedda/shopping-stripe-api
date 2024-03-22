@@ -29,8 +29,6 @@ class Products extends CI_Controller
         $data['products'] = $this->Product->fetchProducts();
 		
 		$data['cart_count'] = $this->getCartCount($this->session->userdata('id'));
-
-
 		
         $this->load->view('partials/header', $data);
         $this->load->view('partials/navbar', $data);

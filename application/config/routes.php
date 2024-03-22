@@ -73,7 +73,11 @@ $route['addtocart'] = 'carts/addToCart';
 //cart
 $route['carts'] = 'carts';
 
+
+
 //remove cart
 $route['removeCartItem/(:any)'] = 'Carts/removeCartItem/$1';
-//checkout
-$route['checkOut/(:any)'] = 'Carts/checkOut/$1';
+
+//checkout stripe
+$route['checkOutStripe']= 'Carts/checkOutStripe';
+
