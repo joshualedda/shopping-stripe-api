@@ -3,8 +3,9 @@
 use Stripe\Stripe;
 use Stripe\Customer;
 use Stripe\Checkout\Session;
+use Stripe\Exception\ApiErrorException;
 
-defined('BASEPATH') or exit ('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 require FCPATH . 'vendor/autoload.php';
 
 class Carts extends CI_Controller
@@ -17,7 +18,6 @@ class Carts extends CI_Controller
 		$this->load->library('form_validation');
 		$this->load->helper('security');
 		$this->load->model('Cart');
-
 	}
 
 	public function index()
@@ -92,28 +92,28 @@ class Carts extends CI_Controller
 			$this->form_validation->set_rules('address', 'Address', 'required');
 			$this->form_validation->set_rules('card_number', 'Card Number', 'required');
 			$this->form_validation->set_rules('price', 'Price', 'required');
-	
+
 			if ($this->form_validation->run() == false) {
 				$this->index();
 			} else {
 				$stripe_secret_key = "sk_test_51Ov8YdP4esyi7AIvH5E2wD8bsIzu8WLSr1NOcS1UBwnohK1m56IUvrKdYTK1kalagQ3z25piVhGJh5CoRHT1seZ600VgFTHnBE";
-				\Stripe\Stripe::setApiKey($stripe_secret_key);
-	
+				Stripe::setApiKey($stripe_secret_key);
+
 				$name = $this->input->post('name');
 				$address = $this->input->post('address');
 				$price = $this->input->post('price');
 				$product_ids = $this->input->post('product_id');
 				$products = $this->input->post('product');
 				$quantities = $this->input->post('quantity');
-	
+
 				try {
-					$customer = \Stripe\Customer::create([
+					$customer = Customer::create([
 						"name" => $name,
 						"address" => [
 							"line1" => $address,
 						],
 					]);
-	
+
 					$line_items = [];
 					foreach ($product_ids as $index => $product_id) {
 						$line_items[] = [
@@ -126,21 +126,26 @@ class Carts extends CI_Controller
 							],
 							"quantity" => $quantities[$index],
 						];
-	
 						$this->Cart->saveOrder($this->session->userdata('id'), $product_id, $quantities[$index]);
+						$this->session->set_flashdata('success', 'Thank you for purchasing!');
 					}
-	
-					$checkout_session = \Stripe\Checkout\Session::create([
+
+					foreach ($product_ids as $product_id) {
+						$this->Cart->deleteCartItem($this->session->userdata('id'), $product_id);
+					}
+
+					$checkout_session = Session::create([
 						"payment_method_types" => ["card"],
 						"mode" => "payment",
 						"line_items" => $line_items,
 						"customer" => $customer->id,
 						"success_url" => base_url('carts'),
+						"cancel_url" => base_url('carts'),
 					]);
-	
+
 					redirect($checkout_session->url, 'location');
-				} catch (\Stripe\Exception\ApiErrorException $e) {
-					echo "Error: " . $e->getMessage();
+				} catch (ApiErrorException $e) {
+					echo  $e->getMessage();
 					$this->session->set_flashdata('error', 'Please try again.');
 					redirect('carts');
 				}
@@ -149,10 +154,5 @@ class Carts extends CI_Controller
 			redirect('carts');
 		}
 	}
-	
 
-	public function checkoutForm()
-	{
-		$this->load->view('checkout_form');
-	}
 }

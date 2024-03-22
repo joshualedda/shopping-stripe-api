@@ -30,7 +30,6 @@ class Cart extends CI_Model
 		return $query->result_array();
 	}
 
-
 	//count cart
 	public function countCart($user_id)
 	{
@@ -57,22 +56,30 @@ class Cart extends CI_Model
 
 	//count query
 	public function getCartsByUserId($user_id)
-    {
-        $sql = "SELECT * FROM carts WHERE user_id = ?";
-        $query = $this->db->query($sql, array($user_id));
+	{
+		$sql = "SELECT * FROM carts WHERE user_id = ?";
+		$query = $this->db->query($sql, array($user_id));
 
-        if ($query->num_rows() > 0) {
-            return $query->result_array();
-        } else {
-            return array(); 
-        }
-    }
+		if ($query->num_rows() > 0) {
+			return $query->result_array();
+		} else {
+			return array();
+		}
+	}
 
 	//add orders
 	public function saveOrder($user_id, $product_id, $quantity)
-    {
+	{
 
-        $sql = "INSERT INTO orders (user_id, product_id) VALUES (?, ?, ?)";
-        $this->db->query($sql, array($user_id, $product_id, $quantity));
-    }
+		$sql = "INSERT INTO orders (user_id, product_id, quantity) VALUES (?, ?, ?)";
+		$this->db->query($sql, array($user_id, $product_id, $quantity));
+	}
+
+	//delete order after purchase
+	public function deleteCartItem($user_id, $product_id)
+	{
+		$sql = "DELETE FROM carts WHERE user_id = ? AND product_id = ?";
+		$this->db->query($sql, array($user_id, $product_id));
+		return $this->db->affected_rows() > 0;
+	}
 }
