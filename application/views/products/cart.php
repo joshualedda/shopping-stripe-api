@@ -61,10 +61,11 @@
 								Biling Info
 							</div>
 							<form action="<?= base_url('checkOutStripe'); ?>" method="POST">
+							<input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>" value="<?= $this->security->get_csrf_hash(); ?>">
 
 								<div class="card-body">
 
-									<input type="hidden" value="<?php echo $totalPrice; ?>" name="price">
+									<!-- <input type="hidden" value="<?php echo $totalPrice; ?>" name="price"> -->
 
 									<?php foreach ($carts as $cartItem) : ?>
 										<input type="hidden" name="product[]" value="<?= $cartItem['name']; ?>">

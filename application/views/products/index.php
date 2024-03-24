@@ -5,6 +5,7 @@
 				<div class="col-md-4 mb-3">
 					<div class="card text-decoration-none text-dark">
 						<form action="<?= base_url('addtocart')  ?>" method="POST">
+						<input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>" value="<?= $this->security->get_csrf_hash(); ?>">
 
 							<div class="card-body">
 								<h5 class="card-title"><?php echo $row['name']; ?></h5>
@@ -16,8 +17,6 @@
 								</div>
 
 								<div class="d-flex justify-content-end my-2">
-
-
 
 									<input type="hidden" name="user_id" value="<?= $user_data['id'] ?? '' ?>">
 									<input type="hidden" name="product_id" value="<?php echo $row['id']; ?>">

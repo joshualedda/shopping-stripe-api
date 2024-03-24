@@ -4,15 +4,6 @@ defined('BASEPATH') or exit('No direct script access allowed');
 class Products extends CI_Controller
 {
 
-    public function __construct()
-    {
-        parent::__construct();
-        $this->load->helper('url');
-        $this->load->library('session');
-        $this->load->library('form_validation');
-        $this->load->model('User');
-        $this->load->model('Product');
-    }
 
     private function prepareUserData()
     {
@@ -30,6 +21,7 @@ class Products extends CI_Controller
 		
 		$data['cart_count'] = $this->getCartCount($this->session->userdata('id'));
 		
+
         $this->load->view('partials/header', $data);
         $this->load->view('partials/navbar', $data);
 		$this->load->view('partials/alert');
