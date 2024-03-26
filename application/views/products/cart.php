@@ -60,17 +60,16 @@
 							<div class="card-header">
 								Biling Info
 							</div>
-							<form action="<?= base_url('checkOutStripe'); ?>" method="POST">
+							<form action="<?= base_url('main/stripeSuccess'); ?>" method="POST">
 							<input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>" value="<?= $this->security->get_csrf_hash(); ?>">
 
 								<div class="card-body">
 
-									<!-- <input type="hidden" value="<?php echo $totalPrice; ?>" name="price"> -->
 
 									<?php foreach ($carts as $cartItem) : ?>
 										<input type="hidden" name="product[]" value="<?= $cartItem['name']; ?>">
-										<input type="hidden" name="product_id[]" value="<?= $cartItem['product_id']; ?>">
 										<input type="hidden" name="quantity[]" value="<?= $cartItem['total_quantity']; ?>">
+										<input type="hidden" name="product_id[]" value="<?= $cartItem['product_id']; ?>">
 									<?php endforeach; ?>
 
 									<div class="mb-3">

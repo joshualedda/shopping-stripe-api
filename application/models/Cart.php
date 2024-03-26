@@ -95,16 +95,22 @@ class Cart extends CI_Model
 	}
 
 		//add orders
-	public function saveOrder($user_id, $product_id, $quantity)
-	{
-		$user_id = $this->security->xss_clean($user_id);
-		$product_id = $this->security->xss_clean($product_id);
-		$quantity = $this->security->xss_clean($quantity);
+		public function saveOrder($user_id, $product_id, $quantity, $name, $address)
+		{
+			$user_id = $this->security->xss_clean($user_id);
+			$product_id = $this->security->xss_clean($product_id);
+			$quantity = $this->security->xss_clean($quantity);
+			
+			$sql = "INSERT INTO orders (user_id, product_id, quantity, name, address) VALUES (?, ?, ?, ?, ?)";
+			$query = $this->db->query($sql, array($user_id, $product_id, $quantity, $name, $address));
 		
-		$sql = "INSERT INTO orders (user_id, product_id, quantity) VALUES (?, ?, ?)";
-		$this->db->query($sql, array($user_id, $product_id, $quantity));
-	}
-
+			if ($this->db->affected_rows() > 0) {
+				return true; 
+			} else {
+				return false;
+			}
+		}
+		
 		
 	//validate stripe
 	public function validateStripe()

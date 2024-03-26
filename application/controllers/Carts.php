@@ -36,7 +36,7 @@ class Carts extends CI_Controller
 	public function crsf()
 	{
 		if ($this->input->post($this->security->get_csrf_token_name()) !== $this->security->get_csrf_hash()) {
-			$this->session->set_flashdata('error', 'The action you performed have been expired.');
+			$this->session->set_flashdata('error', 'Please login first.');
 		}
 	}
 
@@ -80,7 +80,8 @@ class Carts extends CI_Controller
 
 		redirect('carts');
 	}
-
+	
+	//for test still need some improvement
 	public function checkOutStripe()
 	{
 		if (!$this->Cart->validateStripe()) {
@@ -88,22 +89,22 @@ class Carts extends CI_Controller
 		} else {
 			$stripe_secret_key = "sk_test_51Ov8YdP4esyi7AIvH5E2wD8bsIzu8WLSr1NOcS1UBwnohK1m56IUvrKdYTK1kalagQ3z25piVhGJh5CoRHT1seZ600VgFTHnBE";
 			Stripe::setApiKey($stripe_secret_key);
-
+	
 			$name = $this->security->xss_clean($this->input->post('name'));
 			$address = $this->security->xss_clean($this->input->post('address'));
-			
+	
 			$product_ids = $this->input->post('product_id');
 			$products = $this->input->post('product');
 			$quantities = $this->input->post('quantity');
 			$totalPrice = 0;
-
 			foreach ($product_ids as $index => $product_id) {
-				$product = $this->Product->getProductById($product_id); 
+				$product = $this->Product->getProductById($product_id);
 				if ($product) {
-					$totalPrice += $product['price'];
+					$subtotal = $product['price'] * $quantities[$index];
+					$totalPrice += $subtotal;
 				}
 			}
-
+	
 			try {
 				$customer = Customer::create([
 					"name" => $name,
@@ -111,7 +112,7 @@ class Carts extends CI_Controller
 						"line1" => $address,
 					],
 				]);
-
+	
 				$line_items = [];
 				foreach ($product_ids as $index => $product_id) {
 					$line_items[] = [
@@ -124,30 +125,62 @@ class Carts extends CI_Controller
 						],
 						"quantity" => $quantities[$index],
 					];
-					$this->Cart->saveOrder($this->session->userdata('id'), $product_id, $quantities[$index]);
-					$this->session->set_flashdata('success', 'Thank you for purchasing!');
 				}
-
-				foreach ($product_ids as $product_id) {
-					$this->Cart->deleteCartItem($this->session->userdata('id'), $product_id);
-				}
-
+	
 				$checkout_session = Session::create([
 					"payment_method_types" => ["card"],
 					"mode" => "payment",
 					"line_items" => $line_items,
 					"customer" => $customer->id,
-					"success_url" => base_url('carts'),
-					"cancel_url" => base_url('carts'),
+					"success_url" => base_url('main/stripeSuccess'),
+					"cancel_url" => base_url('cart'), 
 				]);
-
+	
 				redirect($checkout_session->url, 'location');
-
 			} catch (ApiErrorException $e) {
-				echo  $e->getMessage();
-				$this->session->set_flashdata('error', 'Please add some item in your cart.');
+				echo $e->getMessage();
+				$this->session->set_flashdata('error', 'Please add some items to your cart.');
 				redirect('carts');
 			}
 		}
+	}
+	
+
+	public function stripeSuccess()
+	{
+		$product_ids = $this->input->post('product_id');
+		$products = $this->input->post('product');
+		$quantities = $this->input->post('quantity');
+
+		
+		$name = $this->security->xss_clean($this->input->post('name'));
+		$address = $this->security->xss_clean($this->input->post('address'));
+
+
+		$totalPrice = 0;
+
+		foreach ($product_ids as $index => $product_id) {
+			$product = $this->Product->getProductById($product_id);
+			if ($product) {
+				$subtotal = $product['price'] * $quantities[$index];
+				$totalPrice += $subtotal;
+
+				$this->Cart->saveOrder(
+					$this->session->userdata('id'),
+					$product_id,
+					$quantities[$index],
+					$name, 
+					$address
+					);
+			}
+		}
+
+		$this->session->set_flashdata('success', 'Thank you for purchasing!');
+
+		foreach ($product_ids as $product_id) {
+			$this->Cart->deleteCartItem($this->session->userdata('id'), $product_id);
+		}
+
+		redirect('carts');
 	}
 }

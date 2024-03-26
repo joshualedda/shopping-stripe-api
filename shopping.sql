@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Mar 22, 2024 at 06:28 AM
+-- Generation Time: Mar 25, 2024 at 02:15 PM
 -- Server version: 8.2.0
 -- PHP Version: 8.2.13
 
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `carts` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=129 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `carts`
@@ -58,18 +58,25 @@ CREATE TABLE IF NOT EXISTS `orders` (
   `user_id` int NOT NULL,
   `product_id` int NOT NULL,
   `quantity` int NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `address` varchar(50) NOT NULL,
   `status` int NOT NULL DEFAULT '0',
   `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`id`, `user_id`, `product_id`, `quantity`, `status`, `created_at`, `updated_at`) VALUES
-(25, 2, 2, 1, 0, '2024-03-22 14:25:01', NULL);
+INSERT INTO `orders` (`id`, `user_id`, `product_id`, `quantity`, `name`, `address`, `status`, `created_at`, `updated_at`) VALUES
+(1, 2, 1, 1, '', '', 0, '2024-03-25 19:02:09', NULL),
+(2, 2, 1, 1, 'Chava', 'Nihil magni minima q', 0, '2024-03-25 19:03:19', NULL),
+(3, 2, 1, 1, 'Wayne', 'Eligendi pariatur B', 0, '2024-03-25 19:18:24', NULL),
+(4, 2, 1, 2, 'Darrel', 'Eiusmod distinctio ', 0, '2024-03-25 19:22:43', NULL),
+(5, 2, 1, 1, 'Davis', 'Qui suscipit quos ni', 0, '2024-03-25 22:07:03', NULL),
+(6, 2, 1, 1, 'Rafael', 'Consectetur duis qu', 0, '2024-03-25 22:14:25', NULL);
 
 -- --------------------------------------------------------
 
